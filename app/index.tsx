@@ -7,7 +7,6 @@ export default function Index() {
   //const [task, setTask] = useState<string | null>(null);
   const [task, setTask] = useState('');
   const [taskItems, setTaskItems] =  useState<string[]>([]);
-  const [warning, setWarning] = useState('');
 
   const handleAddTask = () => {
     console.log("taskk");
@@ -149,8 +148,5 @@ const styles = StyleSheet.create({
     color: '#666666',
     textAlign: 'center',
     fontWeight: 'bold'
-  },
-  warningText: {
-    display: 'none',
   },
 });
