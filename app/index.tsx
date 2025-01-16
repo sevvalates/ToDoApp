@@ -1,4 +1,4 @@
-import { KeyboardAvoidingView,TextInput, Platform, StyleSheet , Text, View, TouchableOpacity, Keyboard } from "react-native";
+import { Image,ScrollView, KeyboardAvoidingView,TextInput, Platform, StyleSheet , Text, View, TouchableOpacity, Keyboard, ToastAndroid } from "react-native";
 import React, { useState } from 'react';
 import Task from "@/components/Task";
 
@@ -7,12 +7,20 @@ export default function Index() {
   //const [task, setTask] = useState<string | null>(null);
   const [task, setTask] = useState('');
   const [taskItems, setTaskItems] =  useState<string[]>([]);
-
+  const [warning, setWarning] = useState('');
 
   const handleAddTask = () => {
     console.log("taskk");
     Keyboard.dismiss(); //yazdıktan sonra keyboard kendi kapansın diye
-    setTaskItems([...taskItems,task]);
+    if(task === '') {
+      ToastAndroid.showWithGravity(
+        "Task cannot be empty",
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER
+      );
+      return;
+    }
+    setTaskItems([...taskItems, task]);
     setTask('');
   }
 
@@ -27,19 +35,22 @@ export default function Index() {
       {/* Today s Tasks */}
       <View style={styles.tasksWrapper}>
         <Text style={styles.sectionTitle} > Today's Tasks </Text>
-        <View style={styles.items}>
-
+        <ScrollView style={styles.items}>
           {
-            taskItems.map((item, index) => {
-              return(
-                <TouchableOpacity key={index} onPress={()=>completeTask(index)}>
+            taskItems.length === 0 ? (
+              <View style={styles.imageWrapper} >
+                <Image source={require('@/assets/images/cat.png')} style={styles.image} />
+                <Text style= {styles.nothingText}> Nothing to do </Text>
+              </View>
+            ) : (
+              taskItems.map((item, index) => (
+                <TouchableOpacity key={index} onPress={() => completeTask(index)}>
                   <Task text={item} />
                 </TouchableOpacity>
-              );
-            })
+              ))
+            )
           }
-  
-        </View>
+        </ScrollView>
       </View>
 
       <KeyboardAvoidingView
@@ -64,7 +75,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#E8EAED',
   },
   tasksWrapper: {
-    paddingTop: 80,
+    paddingTop: 30,
     paddingHorizontal: 20,
   },
   sectionTitle: {
@@ -103,5 +114,27 @@ const styles = StyleSheet.create({
   },
   addText: {
 
+  },
+  imageWrapper: {
+    //backgroundColor: '#3399FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 100,
+    marginTop: 50,
+  },
+  image: {
+    width: 200,
+    height: 200,
+    resizeMode: 'contain',
+  },
+  nothingText: {
+    marginTop: 5,
+    fontSize: 20,
+    color: '#666666',
+    textAlign: 'center',
+    fontWeight: 'bold'
+  },
+  warningText: {
+    display: 'none',
   },
 });
