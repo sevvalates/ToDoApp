@@ -1,4 +1,4 @@
-import { Image,ScrollView, KeyboardAvoidingView,TextInput, Platform, StyleSheet , Text, View, TouchableOpacity, Keyboard, ToastAndroid } from "react-native";
+import { Image,ScrollView, KeyboardAvoidingView,TextInput, Platform, StyleSheet , Text, View, TouchableOpacity, Keyboard, ToastAndroid, Alert } from "react-native";
 import React, { useState } from 'react';
 import Task from "@/components/Task";
 
@@ -25,9 +25,25 @@ export default function Index() {
   }
 
   const completeTask = (index: number) => {
-    let itemsCopy = [...taskItems];
-    itemsCopy.splice(index, 1);  // Removes the task at the given index
-    setTaskItems(itemsCopy);
+    Alert.alert(
+      "Delete Task",
+      "Are you sure you want to delete this task?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        {
+          text: "Yes",
+          onPress: () => {
+            let itemsCopy = [...taskItems];
+            itemsCopy.splice(index, 1);  // Removes the task at the given index
+            setTaskItems(itemsCopy);
+          }
+        }
+      ],
+      { cancelable: true }
+    );
   }
 
   return (
