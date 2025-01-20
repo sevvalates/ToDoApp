@@ -4,14 +4,20 @@ import Task from "@/components/Task";
 
 export default function Index() {
 
-  //const [task, setTask] = useState<string | null>(null);
-  const [task, setTask] = useState('');
-  const [taskItems, setTaskItems] =  useState<string[]>([]);
+  //const [task, setTask] = useState('');
+  //const [taskItems, setTaskItems] =  useState<string[]>([]);
+  type TaskItem = {
+    text: string;
+    completed: boolean;
+  };
+  
+  const [taskItem, setTaskItem] = useState<TaskItem>({text: '', completed: false});
+  const [taskItems, setTaskItems] = useState<TaskItem[]>([]);
 
   const handleAddTask = () => {
     console.log("taskk");
     Keyboard.dismiss(); //yazdıktan sonra keyboard kendi kapansın diye
-    if(task === '') {
+    if(taskItem.text === ''){
       ToastAndroid.showWithGravity(
         "Task cannot be empty",
         ToastAndroid.SHORT,
@@ -19,10 +25,11 @@ export default function Index() {
       );
       return;
     }
-    setTaskItems([...taskItems, task]);
-    setTask('');
+    setTaskItems([...taskItems, taskItem]);
+    setTaskItem({text: '',completed: false});  //yeni bir görev ekledikten sonra giriş alanının temizlenmesini sağlar.
   }
-
+  
+  //kullanmıyorum
   const completeTask = (index: number) => {
     Alert.alert(
       "Delete Task",
@@ -45,6 +52,13 @@ export default function Index() {
     );
   }
 
+  const toggleTaskCompletion = (index: number) => {
+    const updatedTasks = taskItems.map((item, i) => 
+        i === index ? { ...item, completed: !item.completed } : item
+    );
+    setTaskItems(updatedTasks);
+  };
+
   return (
     <View style={styles.container}>
       {/* Today s Tasks */}
@@ -59,9 +73,12 @@ export default function Index() {
               </View>
             ) : (
               taskItems.map((item, index) => (
-                <TouchableOpacity key={index} onPress={() => completeTask(index)}>
-                  <Task text={item} />
-                </TouchableOpacity>
+                <Task 
+                    key={index} 
+                    text={item.text} 
+                    completed={item.completed}
+                    onToggleComplete={() => toggleTaskCompletion(index)} 
+                />
               ))
             )
           }
@@ -72,7 +89,7 @@ export default function Index() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.writeTaskWrapper}
       >
-        <TextInput style={styles.input} placeholder={'Write a Task'} value={task} onChangeText={(text) => setTask(text)}/>
+        <TextInput style={styles.input} placeholder={'Write a Task'} value={taskItem.text} onChangeText={(text) => setTaskItem({text, completed: false})}/>
         <TouchableOpacity onPress={()=>handleAddTask()}>
           <View style={styles.addWrapper}>
             <Text style={styles.addText}> + </Text>

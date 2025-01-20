@@ -1,22 +1,46 @@
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-
+import { MaterialIcons } from '@expo/vector-icons';
 
 type Props = {
     text: string;
+    completed: boolean;
+    onToggleComplete: () => void;
 };
   
-export default function Task({text}: Props){
-
-    return(
-        <View style={styles.item}>
-            <View style={styles.itemLeft}>
-                <TouchableOpacity style={styles.square}></TouchableOpacity>
-                <Text style={styles.itemText}> {text} </Text>
-            </View>
-            <View style={styles.circular}></View>
+export default function Task({text,completed,onToggleComplete}: Props){
+/*
+return (
+    <View style={styles.item}>
+        <View style={styles.itemLeft}>
+            <TouchableOpacity 
+                style={[styles.square, completed && styles.completedSquare]} 
+                onPress={onToggleComplete}
+            />
+            <Text style={[styles.itemText, completed && styles.completedText]}>
+                {text}
+            </Text>
         </View>
-    );
+    </View>
+);
+*/  
+
+return (
+    <View style={styles.item}>
+        <View style={styles.itemLeft}>
+            <TouchableOpacity onPress={onToggleComplete}>
+                <MaterialIcons 
+                    name={completed ? 'check-box' : 'check-box-outline-blank'} 
+                    size={30} 
+                    color={completed ? '#4CAF50' : '#55BCF6'} 
+                />
+            </TouchableOpacity>
+            <Text style={[styles.itemText, completed && styles.completedText]}>
+                {text}
+            </Text>
+        </View>
+    </View>
+);
 
 }
 
@@ -44,7 +68,9 @@ const styles = StyleSheet.create({
         marginRight: 15,
     },
     itemText:{
-        maxWidth: '80%'
+        maxWidth: '80%',
+        marginLeft: 5,
+        fontSize: 16,
     },
     circular: {
         width: 12,
@@ -53,5 +79,12 @@ const styles = StyleSheet.create({
         borderWidth: 2,
         borderRadius: 5,
     },
-
+    completedSquare: {
+        backgroundColor: '#4CAF50',
+        opacity: 1,
+    },
+    completedText: {
+        textDecorationLine: 'line-through',
+        color: '#808080',
+    },
 });
