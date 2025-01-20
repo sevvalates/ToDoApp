@@ -1,9 +1,19 @@
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import Index from "./"; // Ensure the correct path to the Index component
+import React, { useState } from 'react';
+import CompletedTasks from './CompletedTasks';
 
 const Drawer = createDrawerNavigator();
 
+type TaskItem = {
+  text: string;
+  completed: boolean;
+};
+
 export default function RootLayout() {
+
+  const [taskItems, setTaskItems] = useState<TaskItem[]>([]);
+
   return (
     <Drawer.Navigator
       initialRouteName="Tasks"
@@ -13,7 +23,13 @@ export default function RootLayout() {
         headerTitleStyle: { fontWeight: 'bold'  ,fontSize: 24, },
       }}
     >
-      <Drawer.Screen name="Tasks" component={Index} />
+      <Drawer.Screen name="Tasks">
+                {props => <Index {...props} taskItems={taskItems} setTaskItems={setTaskItems} />}
+      </Drawer.Screen>
+
+      <Drawer.Screen name="Completed Tasks">
+                {props => <CompletedTasks {...props} tasks={taskItems.filter(task => task.completed)} />}
+      </Drawer.Screen>
       {/* Add more screens here */}
     </Drawer.Navigator>
   );

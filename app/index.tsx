@@ -2,17 +2,30 @@ import { Image,ScrollView, KeyboardAvoidingView,TextInput, Platform, StyleSheet 
 import React, { useState } from 'react';
 import Task from "@/components/Task";
 
-export default function Index() {
+type TaskItem = {
+  text: string;
+  completed: boolean;
+};
+//export default function Index() {
+export default function Index({ taskItems, setTaskItems }: { taskItems: TaskItem[], setTaskItems: React.Dispatch<React.SetStateAction<TaskItem[]>> }) {
 
-  //const [task, setTask] = useState('');
-  //const [taskItems, setTaskItems] =  useState<string[]>([]);
+  /* //taskitems 1.hal
+  const [task, setTask] = useState('');
+  const [taskItems, setTaskItems] =  useState<string[]>([]);
+  */
+
+  /* //taskItems 2.hal
   type TaskItem = {
     text: string;
     completed: boolean;
   };
-  
   const [taskItem, setTaskItem] = useState<TaskItem>({text: '', completed: false});
   const [taskItems, setTaskItems] = useState<TaskItem[]>([]);
+  */
+
+
+  const [taskItem, setTaskItem] = useState<TaskItem>({text: '', completed: false});
+
 
   const handleAddTask = () => {
     console.log("taskk");
