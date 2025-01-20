@@ -63,7 +63,6 @@ export default function Index() {
     <View style={styles.container}>
       {/* Today s Tasks */}
       <View style={styles.tasksWrapper}>
-        <Text style={styles.sectionTitle} > Today's Tasks </Text>
         <ScrollView style={styles.items}>
           {
             taskItems.length === 0 ? (
