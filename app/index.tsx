@@ -1,19 +1,23 @@
 import { Image,ScrollView, KeyboardAvoidingView,TextInput, Platform, StyleSheet , Text, View, TouchableOpacity, Keyboard, ToastAndroid, Alert } from "react-native";
 import React, { useState } from 'react';
 import Task from "@/components/Task";
+import { useTaskContext } from "@/components/TaskContext";
 
 export default function Index() {
 
   //const [task, setTask] = useState('');
   //const [taskItems, setTaskItems] =  useState<string[]>([]);
   type TaskItem = {
+    id: number;
     text: string;
     completed: boolean;
   };
   
-  const [taskItem, setTaskItem] = useState<TaskItem>({text: '', completed: false});
-  const [taskItems, setTaskItems] = useState<TaskItem[]>([]);
-
+  //const [taskItem, setTaskItem] = useState<TaskItem>({text: '', completed: false});
+  //const [taskItems, setTaskItems] = useState<TaskItem[]>([]);
+  const [taskItem, setTaskItem] = useState<TaskItem>({id: Date.now(), text: '', completed: false});
+  const { taskItems, setTaskItems } = useTaskContext();
+  
   const handleAddTask = () => {
     console.log("taskk");
     Keyboard.dismiss(); //yazdıktan sonra keyboard kendi kapansın diye
@@ -25,8 +29,10 @@ export default function Index() {
       );
       return;
     }
-    setTaskItems([...taskItems, taskItem]);
-    setTaskItem({text: '',completed: false});  //yeni bir görev ekledikten sonra giriş alanının temizlenmesini sağlar.
+    //setTaskItems([...taskItems, taskItem]);
+    //setTaskItem({text: '',completed: false});  //yeni bir görev ekledikten sonra giriş alanının temizlenmesini sağlar.
+    setTaskItems([...taskItems, { ...taskItem, id: Date.now() }]);
+    setTaskItem({id: Date.now(), text: '', completed: false});  
   }
   
   //kullanmıyorum
@@ -52,16 +58,25 @@ export default function Index() {
     );
   }
 
+/*  
   const toggleTaskCompletion = (index: number) => {
     const updatedTasks = taskItems.map((item, i) => 
         i === index ? { ...item, completed: !item.completed } : item
     );
     setTaskItems(updatedTasks);
   };
+*/
+
+  const toggleTaskCompletion = (taskId: number) => {
+    const updatedTasks = taskItems.map(item => 
+        item.id === taskId ? { ...item, completed: !item.completed } : item
+    );
+    setTaskItems(updatedTasks);
+  };
 
   return (
     <View style={styles.container}>
-      {/* Today s Tasks */}
+      {/* Today's Tasks */}
       <View style={styles.tasksWrapper}>
         <ScrollView style={styles.items}>
           {
@@ -71,12 +86,12 @@ export default function Index() {
                 <Text style= {styles.nothingText}> Nothing to do </Text>
               </View>
             ) : (
-              taskItems.map((item, index) => (
+              taskItems.map((item) => (
                 <Task 
-                    key={index} 
+                    key={item.id} 
                     text={item.text} 
                     completed={item.completed}
-                    onToggleComplete={() => toggleTaskCompletion(index)} 
+                    onToggleComplete={() => toggleTaskCompletion(item.id)} 
                 />
               ))
             )
@@ -88,14 +103,13 @@ export default function Index() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.writeTaskWrapper}
       >
-        <TextInput style={styles.input} placeholder={'Write a Task'} value={taskItem.text} onChangeText={(text) => setTaskItem({text, completed: false})}/>
-        <TouchableOpacity onPress={()=>handleAddTask()}>
+        <TextInput style={styles.input} placeholder={'Write a Task'} value={taskItem.text} onChangeText={(text) => setTaskItem({id: taskItem.id, text, completed: false})}/>
+        <TouchableOpacity onPress={() => handleAddTask() }>
           <View style={styles.addWrapper}>
             <Text style={styles.addText}> + </Text>
           </View> 
         </TouchableOpacity>
       </KeyboardAvoidingView>
-
     </View>
   );
 }
