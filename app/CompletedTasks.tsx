@@ -4,15 +4,15 @@ import Task from '@/components/Task';
 import { useTaskContext } from '@/components/TaskContext';
 
 export default function CompletedTasks() {
-  const { taskItems, setTaskItems } = useTaskContext();
+  const { taskItems, saveTasks } = useTaskContext();
 
   const completedTasks = taskItems.filter(task => task.completed);
 
-  const toggleTaskCompletion = (taskId: number) => {
+  const toggleTaskCompletion = async (taskId: number) => {
     const updatedTasks = taskItems.map(item => 
         item.id === taskId ? { ...item, completed: !item.completed } : item
     );
-    setTaskItems(updatedTasks);
+    saveTasks(updatedTasks);
   };
 
   return (

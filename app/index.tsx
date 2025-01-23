@@ -15,10 +15,12 @@ export default function Index() {
   
   //const [taskItem, setTaskItem] = useState<TaskItem>({text: '', completed: false});
   //const [taskItems, setTaskItems] = useState<TaskItem[]>([]);
-  const [taskItem, setTaskItem] = useState<TaskItem>({id: Date.now(), text: '', completed: false});
-  const { taskItems, setTaskItems } = useTaskContext();
   
-  const handleAddTask = () => {
+  const [taskItem, setTaskItem] = useState<TaskItem>({id: Date.now(), text: '', completed: false});
+  //const { taskItems, setTaskItems } = useTaskContext();
+  const { taskItems, saveTasks } = useTaskContext();
+
+  const handleAddTask = async () => {
     console.log("taskk");
     Keyboard.dismiss(); //yazdıktan sonra keyboard kendi kapansın diye
     if(taskItem.text === ''){
@@ -29,12 +31,18 @@ export default function Index() {
       );
       return;
     }
+
     //setTaskItems([...taskItems, taskItem]);
     //setTaskItem({text: '',completed: false});  //yeni bir görev ekledikten sonra giriş alanının temizlenmesini sağlar.
-    setTaskItems([...taskItems, { ...taskItem, id: Date.now() }]);
-    setTaskItem({id: Date.now(), text: '', completed: false});  
-  }
+    
+    //setTaskItems([...taskItems, { ...taskItem, id: Date.now() }]);
+    //setTaskItem({id: Date.now(), text: '', completed: false});  
   
+    const newTaskList = [...taskItems, {...taskItem,id: Date.now()}];
+    await saveTasks(newTaskList);
+    setTaskItem({id: Date.now(), text: '', completed: false});
+  }
+  /*
   //kullanmıyorum
   const completeTask = (index: number) => {
     Alert.alert(
@@ -57,6 +65,7 @@ export default function Index() {
       { cancelable: true }
     );
   }
+*/
 
 /*  
   const toggleTaskCompletion = (index: number) => {
@@ -67,11 +76,12 @@ export default function Index() {
   };
 */
 
-  const toggleTaskCompletion = (taskId: number) => {
+  const toggleTaskCompletion = async (taskId: number) => {
     const updatedTasks = taskItems.map(item => 
         item.id === taskId ? { ...item, completed: !item.completed } : item
     );
-    setTaskItems(updatedTasks);
+    //setTaskItems(updatedTasks);
+    await saveTasks(updatedTasks);
   };
 
   return (
