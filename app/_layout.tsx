@@ -10,13 +10,13 @@ export default function RootLayout() {
   return (
     <TaskProvider>
       <Drawer.Navigator
-        initialRouteName="Tasks"
+        initialRouteName="All Tasks" 
         
         screenOptions={{
 
           drawerStyle: {
             backgroundColor: '#fff', // Drawer'ın arka plan rengi
-            width: 250, // Drawer genişliği
+            width: 300, // Drawer genişliği
             paddingTop: 20,
             borderColor: '#676667',
             borderWidth: 2,
@@ -44,11 +44,18 @@ export default function RootLayout() {
             drawerIcon: ({ color, size }) => (
               <MaterialIcons name="home" color={color} size={size} />
             ),
-
-            
           }} 
         />
-        <Drawer.Screen name="Completed Tasks" component={CompletedTasks} />
+
+        <Drawer.Screen 
+          name="Completed Tasks" 
+          component={CompletedTasks}
+          options={{
+            drawerIcon: ({ color, size }) => (
+              <MaterialIcons name="list" color={color} size={size} />
+            ),
+          }} 
+        />
         {/* Add more screens here */}
       </Drawer.Navigator>
     </TaskProvider>
