@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, ScrollView, Text, View } from 'react-native';
+import {StyleSheet,Image, ScrollView, Text, View } from 'react-native';
 import Task from '@/components/Task';
 import { useTaskContext } from '@/components/TaskContext';
 
@@ -20,8 +20,11 @@ export default function CompletedTasks() {
       <View style={styles.tasksWrapper}>
         
         <ScrollView style={styles.items}>
-            {completedTasks.length === 0 ? (
-                <Text>No completed tasks</Text>
+            {completedTasks.length === 0 ? (                
+              <View style={styles.imageWrapper} >
+                <Image source={require('@/assets/images/cat.png')} style={styles.image} />
+                <Text style= {styles.nothingText}> No completed task </Text>
+              </View>
             ) : (
                 completedTasks.map((task) => (
                 <Task key={task.id} text={task.text} completed={task.completed} onToggleComplete={() => toggleTaskCompletion(task.id)}/>
@@ -47,7 +50,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   items: {
-    marginTop: 30,
+    marginTop: 10,
+    marginBottom: 150,
   },
   writeTaskWrapper: {
     position: 'absolute',

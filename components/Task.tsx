@@ -68,9 +68,10 @@ const styles = StyleSheet.create({
         marginRight: 15,
     },
     itemText:{
-        maxWidth: '80%',
+        maxWidth: '90%',
         marginLeft: 5,
         fontSize: 16,
+        marginRight: 5,
     },
     circular: {
         width: 12,

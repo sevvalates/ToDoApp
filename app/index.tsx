@@ -2,6 +2,7 @@ import { Image,ScrollView, KeyboardAvoidingView,TextInput, Platform, StyleSheet 
 import React, { useState } from 'react';
 import Task from "@/components/Task";
 import { useTaskContext } from "@/components/TaskContext";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 export default function Index() {
 
@@ -116,7 +117,11 @@ export default function Index() {
         <TextInput style={styles.input} placeholder={'Write a Task'} value={taskItem.text} onChangeText={(text) => setTaskItem({id: taskItem.id, text, completed: false})}/>
         <TouchableOpacity onPress={() => handleAddTask() }>
           <View style={styles.addWrapper}>
-            <Text style={styles.addText}> + </Text>
+              <MaterialIcons 
+                      name={'add'} 
+                      size={50} 
+                      color={'#676667'}
+              />          
           </View> 
         </TouchableOpacity>
       </KeyboardAvoidingView>
@@ -138,7 +143,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   items: {
-    marginTop: 30,
+    marginTop: 10,
+    marginBottom: 150,
   },
   writeTaskWrapper: {
     position: 'absolute',
@@ -154,18 +160,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     borderRadius: 60,
     borderColor: '#C0C0C0',
-    borderWidth: 1,
-    width: 250,
+    borderWidth: 3,
+    width: 280,
+    marginLeft: 15,
   },
   addWrapper: {
-    width: 60,
-    height: 60,
-    backgroundColor: '#FFF',
+    width: 75,
+    height: 75,
+    backgroundColor: '#C0C0C0',
     borderRadius: 60,
     justifyContent: 'center',
     alignItems: 'center',
     borderColor: '#C0C0C0',
-    borderWidth: 1,
+    borderWidth: 3,
+    marginRight: 15,
   },
   addText: {
 
