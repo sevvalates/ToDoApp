@@ -11,7 +11,10 @@ type TaskItem = {
 type TaskContextType = {
   taskItems: TaskItem[];
   //setTaskItems: React.Dispatch<React.SetStateAction<TaskItem[]>>;
+  
   saveTasks: (newTasks: TaskItem[]) => Promise<void>;
+  addTask: (newTask: TaskItem) => void;
+  deleteTask: (taskId: number) => void;
 };
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
@@ -65,8 +68,20 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }
     }
   };
 
+  //sonradan ekledim addtask deletetask 24.01.2025
+  const addTask = (newTask : TaskItem) => {
+    const updatedTasks = [...taskItems, newTask];
+    saveTasks(updatedTasks); // Tek bir merkezde veri saklama
+  };
+  
+  const deleteTask = (taskId : number) => {
+    const updatedTasks = taskItems.filter((task) => task.id !== taskId);
+    saveTasks(updatedTasks); // Aynı mantıkla çalışır
+  };
+  
+
   return (
-    <TaskContext.Provider value={{ taskItems, saveTasks }}>
+    <TaskContext.Provider value={{ taskItems, saveTasks, addTask, deleteTask }}>
       {children}
     </TaskContext.Provider>
   );

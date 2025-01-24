@@ -19,7 +19,9 @@ export default function Index() {
   
   const [taskItem, setTaskItem] = useState<TaskItem>({id: Date.now(), text: '', completed: false});
   //const { taskItems, setTaskItems } = useTaskContext();
-  const { taskItems, saveTasks } = useTaskContext();
+ 
+ // const { taskItems, saveTasks } = useTaskContext();
+  const { taskItems, saveTasks, addTask , deleteTask } = useTaskContext();
 
   const handleAddTask = async () => {
     console.log("taskk");
@@ -38,9 +40,14 @@ export default function Index() {
     
     //setTaskItems([...taskItems, { ...taskItem, id: Date.now() }]);
     //setTaskItem({id: Date.now(), text: '', completed: false});  
-  
+
+  /*
     const newTaskList = [...taskItems, {...taskItem,id: Date.now()}];
     await saveTasks(newTaskList);
+    setTaskItem({id: Date.now(), text: '', completed: false});
+  */
+    const newTask = {...taskItem,id: Date.now()};
+    addTask(newTask); 
     setTaskItem({id: Date.now(), text: '', completed: false});
   }
   /*
@@ -85,6 +92,27 @@ export default function Index() {
     await saveTasks(updatedTasks);
   };
 
+  const handleDeleteTask = async (taskId: number) => {
+    Alert.alert(
+      "Delete Task",
+      "Are you sure you want to delete this task?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        {
+          text: "Yes",
+          onPress: () => {
+            deleteTask(taskId);
+          }
+        }
+      ],
+      { cancelable: true }
+    );
+  };
+  
+
   return (
     <View style={styles.container}>
       {/* Today's Tasks */}
@@ -98,12 +126,14 @@ export default function Index() {
               </View>
             ) : (
               taskItems.map((item) => (
-                <Task 
-                    key={item.id} 
-                    text={item.text} 
-                    completed={item.completed}
-                    onToggleComplete={() => toggleTaskCompletion(item.id)} 
-                />
+                <TouchableOpacity key={item.id} onLongPress={() => handleDeleteTask(item.id)}>
+                  <Task 
+                      key={item.id} 
+                      text={item.text} 
+                      completed={item.completed}
+                      onToggleComplete={() => toggleTaskCompletion(item.id)} 
+                  />
+                </TouchableOpacity>
               ))
             )
           }
@@ -144,11 +174,11 @@ const styles = StyleSheet.create({
   },
   items: {
     marginTop: 10,
-    marginBottom: 150,
+    marginBottom: 155,
   },
   writeTaskWrapper: {
     position: 'absolute',
-    bottom: 60,    
+    bottom: 40,    
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-around',
