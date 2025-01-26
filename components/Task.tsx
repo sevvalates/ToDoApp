@@ -9,38 +9,23 @@ type Props = {
 };
   
 export default function Task({text,completed,onToggleComplete}: Props){
-/*
-return (
-    <View style={styles.item}>
-        <View style={styles.itemLeft}>
-            <TouchableOpacity 
-                style={[styles.square, completed && styles.completedSquare]} 
-                onPress={onToggleComplete}
-            />
-            <Text style={[styles.itemText, completed && styles.completedText]}>
-                {text}
-            </Text>
-        </View>
-    </View>
-);
-*/  
 
-return (
-    <View style={styles.item}>
-        <View style={styles.itemLeft}>
-            <TouchableOpacity onPress={onToggleComplete}>
-                <MaterialIcons 
-                    name={completed ? 'check-box' : 'check-box-outline-blank'} 
-                    size={30} 
-                    color={completed ? '#4CAF50' : '#55BCF6'} 
-                />
-            </TouchableOpacity>
-            <Text style={[styles.itemText, completed && styles.completedText]}>
-                {text}
-            </Text>
+    return (
+        <View style={styles.item}>
+            <View style={styles.itemLeft}>
+                <TouchableOpacity onPress={onToggleComplete}>
+                    <MaterialIcons 
+                        name={completed ? 'check-box' : 'check-box-outline-blank'} 
+                        size={30} 
+                        color={completed ? '#4CAF50' : '#55BCF6'} 
+                    />
+                </TouchableOpacity>
+                <Text style={[styles.itemText, completed && styles.completedText]}>
+                    {text}
+                </Text>
+            </View>
         </View>
-    </View>
-);
+    );
 
 }
 

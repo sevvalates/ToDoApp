@@ -6,21 +6,13 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 export default function Index() {
 
-  //const [task, setTask] = useState('');
-  //const [taskItems, setTaskItems] =  useState<string[]>([]);
   type TaskItem = {
     id: number;
     text: string;
     completed: boolean;
   };
   
-  //const [taskItem, setTaskItem] = useState<TaskItem>({text: '', completed: false});
-  //const [taskItems, setTaskItems] = useState<TaskItem[]>([]);
-  
   const [taskItem, setTaskItem] = useState<TaskItem>({id: Date.now(), text: '', completed: false});
-  //const { taskItems, setTaskItems } = useTaskContext();
- 
- // const { taskItems, saveTasks } = useTaskContext();
   const { taskItems, saveTasks, addTask , deleteTask } = useTaskContext();
 
   const handleAddTask = async () => {
@@ -35,12 +27,6 @@ export default function Index() {
       return;
     }
 
-    //setTaskItems([...taskItems, taskItem]);
-    //setTaskItem({text: '',completed: false});  //yeni bir görev ekledikten sonra giriş alanının temizlenmesini sağlar.
-    
-    //setTaskItems([...taskItems, { ...taskItem, id: Date.now() }]);
-    //setTaskItem({id: Date.now(), text: '', completed: false});  
-
   /*
     const newTaskList = [...taskItems, {...taskItem,id: Date.now()}];
     await saveTasks(newTaskList);
@@ -50,45 +36,11 @@ export default function Index() {
     addTask(newTask); 
     setTaskItem({id: Date.now(), text: '', completed: false});
   }
-  /*
-  //kullanmıyorum
-  const completeTask = (index: number) => {
-    Alert.alert(
-      "Delete Task",
-      "Are you sure you want to delete this task?",
-      [
-        {
-          text: "Cancel",
-          style: "cancel"
-        },
-        {
-          text: "Yes",
-          onPress: () => {
-            let itemsCopy = [...taskItems];
-            itemsCopy.splice(index, 1);  // Removes the task at the given index
-            setTaskItems(itemsCopy);
-          }
-        }
-      ],
-      { cancelable: true }
-    );
-  }
-*/
-
-/*  
-  const toggleTaskCompletion = (index: number) => {
-    const updatedTasks = taskItems.map((item, i) => 
-        i === index ? { ...item, completed: !item.completed } : item
-    );
-    setTaskItems(updatedTasks);
-  };
-*/
 
   const toggleTaskCompletion = async (taskId: number) => {
     const updatedTasks = taskItems.map(item => 
         item.id === taskId ? { ...item, completed: !item.completed } : item
     );
-    //setTaskItems(updatedTasks);
     await saveTasks(updatedTasks);
   };
 
