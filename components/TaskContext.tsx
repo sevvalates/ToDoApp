@@ -1,20 +1,28 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
 type TaskItem = {
   id: number;
   text: string;
   completed: boolean;
 };
 
+type TaskList = {
+  id: number;
+  name: string;
+  tasks: TaskItem[];
+};
+
 type TaskContextType = {
   taskItems: TaskItem[];
   //setTaskItems: React.Dispatch<React.SetStateAction<TaskItem[]>>;
-  
   saveTasks: (newTasks: TaskItem[]) => Promise<void>;
   addTask: (newTask: TaskItem) => void;
   deleteTask: (taskId: number) => void;
+
+  taskLists: TaskList[];
+  addTaskList: (newTaskList: TaskList) => void;
+  saveTaskLists: (newTaskLists: TaskList[]) => Promise<void>;
 };
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
@@ -37,24 +45,27 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {..}
 
 export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
   const [taskItems, setTaskItems] = useState<TaskItem[]>([]);
+  const [taskLists, setTaskLists] = useState<TaskList[]>([]);
 
   // Verileri AsyncStorage'dan yükle
   useEffect(() => {
-
-    const loadTasks = async () => {
+    const loadTasks = async () => { //bunu useEffect dışına alabiliriz
       try{
         const storedTasks = await AsyncStorage.getItem('tasks');
+        const storedTaskLists = await AsyncStorage.getItem('taskLists');
+
         if(storedTasks){
           setTaskItems(JSON.parse(storedTasks));
+        }
+        if (storedTaskLists) {
+          setTaskLists(JSON.parse(storedTaskLists));
         }
       } 
       catch(error){
         console.log("Veriler yüklenemedi: ",error);
       }
     };
-
     loadTasks();
-
   }, []);
 
   // Verileri AsyncStorage'a kaydet
@@ -68,6 +79,16 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }
     }
   };
 
+  const saveTaskLists = async (newTaskLists: TaskList[]) => {
+    try {
+      await AsyncStorage.setItem('taskLists', JSON.stringify(newTaskLists));
+      setTaskLists(newTaskLists);
+    } catch (error) {
+      console.log("Veriler kaydedilemedi: ", error);
+    }
+  };
+
+
   //sonradan ekledim addtask deletetask 24.01.2025
   const addTask = (newTask : TaskItem) => {
     const updatedTasks = [...taskItems, newTask];
@@ -78,11 +99,16 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }
     const updatedTasks = taskItems.filter((task) => task.id !== taskId);
     saveTasks(updatedTasks); // Aynı mantıkla çalışır
   };
-  
 
+  const addTaskList = (newTaskList: TaskList) => {
+    const updatedTaskLists = [...taskLists, newTaskList];
+    saveTaskLists(updatedTaskLists);
+  };
+
+  //{children}, TaskProvider içine eklenen tüm bileşenleri temsil eder.
   return (
-    <TaskContext.Provider value={{ taskItems, saveTasks, addTask, deleteTask }}>
-      {children}
+    <TaskContext.Provider value={{ taskItems, taskLists, saveTasks,saveTaskLists, addTask, deleteTask, addTaskList }}>
+      {children} 
     </TaskContext.Provider>
   );
 };

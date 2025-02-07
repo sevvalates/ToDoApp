@@ -1,63 +1,12 @@
-import { createDrawerNavigator } from '@react-navigation/drawer';
-import Index from "./"; // Ensure the correct path to the Index component
+import { NavigationContainer } from '@react-navigation/native';
 import { TaskProvider } from '@/components/TaskContext';
-import CompletedTasks from './CompletedTasks';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import RootLayout from './RootLayout';
 
-const Drawer = createDrawerNavigator();
-
-export default function RootLayout() {
+export default function App() {
   return (
     <TaskProvider>
-      <Drawer.Navigator
-        initialRouteName="All Tasks" 
-        
-        screenOptions={{
-
-          drawerStyle: {
-            backgroundColor: '#fff', // Drawer'ın arka plan rengi
-            width: 300, // Drawer genişliği
-            paddingTop: 20,
-            borderColor: '#676667',
-            borderWidth: 2,
-          },
-          drawerActiveTintColor: '#525252 ', // Seçili öğe yazı rengi
-          drawerInactiveTintColor: '#676667', // Seçili olmayan öğe yazı rengi
-          drawerActiveBackgroundColor: '#C0C0C0', // Seçili öğe arka plan rengi
-          drawerInactiveBackgroundColor: '#fff', // Seçili olmayan öğe arka plan rengi
-          
-          drawerLabelStyle: {
-            fontSize: 18, // Yazı boyutu
-          },
-
-          headerStyle: { backgroundColor: '#676667',height: 60  }, // Change the top navigator's color
-          headerTintColor: '#fff',
-          headerTitleStyle: { fontWeight: 'bold'  ,fontSize: 24, },
-
-          
-        }}
-      >
-        <Drawer.Screen 
-          name="All Tasks" 
-          component={Index} 
-          options={{
-            drawerIcon: ({ color, size }) => (
-              <MaterialIcons name="home" color={color} size={size} />
-            ),
-          }} 
-        />
-
-        <Drawer.Screen 
-          name="Completed Tasks" 
-          component={CompletedTasks}
-          options={{
-            drawerIcon: ({ color, size }) => (
-              <MaterialIcons name="list" color={color} size={size} />
-            ),
-          }} 
-        />
-        {/* Add more screens here */}
-      </Drawer.Navigator>
+        <RootLayout />
     </TaskProvider>
   );
+  // RootLayout, TaskProvider içindeki verileri ve fonksiyonları useTaskContext() ile kullanabilir.
 }
