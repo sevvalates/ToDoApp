@@ -12,7 +12,7 @@ const Drawer = createDrawerNavigator();
 
 function CustomDrawerContent({ navigation }: DrawerContentComponentProps) {
   const { taskLists } = useTaskContext();
-  const [isAddTaskListModalVisible, setAddTaskListModalVisible] = useState(false);
+  const [isAddTaskListModalVisible, setAddTaskListModalVisible] = useState(false); //"Add new list" modalını açıp kapatma
 
   return (
     <View style={{ flex: 1, padding: 20 }}>
