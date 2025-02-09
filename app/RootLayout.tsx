@@ -106,6 +106,7 @@ export default function RootLayout() {
         name="Completed Tasks"
         component={CompletedTasks}
       />
+
       {taskLists.map(list => (
         <Drawer.Screen
           key={list.id}

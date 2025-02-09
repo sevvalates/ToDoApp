@@ -49,20 +49,30 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }
 
   // Verileri AsyncStorage'dan yükle
   useEffect(() => {
-    const loadTasks = async () => { //bunu useEffect dışına alabiliriz
-      try{
+    const loadTasks = async () => {
+      try {
         const storedTasks = await AsyncStorage.getItem('tasks');
         const storedTaskLists = await AsyncStorage.getItem('taskLists');
 
-        if(storedTasks){
+        if (storedTasks) {
           setTaskItems(JSON.parse(storedTasks));
         }
         if (storedTaskLists) {
-          setTaskLists(JSON.parse(storedTaskLists));
+          const parsedTaskLists = JSON.parse(storedTaskLists);
+          if (parsedTaskLists.length === 0) {
+            const defaultList = { id: 1, name: 'Default List', tasks: [] };
+            setTaskLists([defaultList]);
+            await saveTaskLists([defaultList]);
+          } else {
+            setTaskLists(parsedTaskLists);
+          }
+        } else {
+          const defaultList = { id: 1, name: 'Default List', tasks: [] };
+          setTaskLists([defaultList]);
+          await saveTaskLists([defaultList]);
         }
-      } 
-      catch(error){
-        console.log("Veriler yüklenemedi: ",error);
+      } catch (error) {
+        console.log("Veriler yüklenemedi: ", error);
       }
     };
     loadTasks();

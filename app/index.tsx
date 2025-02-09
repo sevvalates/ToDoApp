@@ -36,16 +36,11 @@ export default function Index() {
         setFilteredTasks(selectedList.tasks);
       }
     }
-    else if(listId==0){
-      console.log("all tasks: ", listId);      
+    else {
       // Eğer listId yoksa, tüm task'ları göster
       const allTasks = taskLists.flatMap(list => list.tasks);
       setFilteredTasks(allTasks);
-    } /*else {
-      // Eğer listId yoksa, tüm task'ları göster
-      const allTasks = taskLists.flatMap(list => list.tasks);
-      setFilteredTasks(allTasks);
-    }*/
+    }
   }, [listId, taskLists]);
 //}, [listId, taskLists.find(list => list.id === listId)]); //OLMADI- sadece ilgili liste takip ediliyor
 
