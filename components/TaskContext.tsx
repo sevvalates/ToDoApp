@@ -58,14 +58,7 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }
           setTaskItems(JSON.parse(storedTasks));
         }
         if (storedTaskLists) {
-          const parsedTaskLists = JSON.parse(storedTaskLists);
-          if (parsedTaskLists.length === 0) {
-            const defaultList = { id: 1, name: 'Default List', tasks: [] };
-            setTaskLists([defaultList]);
-            await saveTaskLists([defaultList]);
-          } else {
-            setTaskLists(parsedTaskLists);
-          }
+          setTaskLists(JSON.parse(storedTaskLists));
         } else {
           const defaultList = { id: 1, name: 'Default List', tasks: [] };
           setTaskLists([defaultList]);
