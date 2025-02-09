@@ -16,35 +16,58 @@ function CustomDrawerContent({ navigation }: DrawerContentComponentProps) {
 
   return (
     <View style={{ flex: 1, padding: 20 }}>
+
+      <TouchableOpacity onPress={() => navigation.navigate('All Tasks')} style={styles.drawerItem}>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <MaterialIcons name="home" size={24} color="black" style={{ marginRight: 10 }} />
+          <Text style={styles.drawerItemText}>All Tasks</Text>
+        </View>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => navigation.navigate('Completed Tasks')} style={styles.drawerItem}>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <MaterialIcons name="check-circle" size={24} color="black" style={{ marginRight: 10 }} />
+          <Text style={styles.drawerItemText}>Completed Tasks</Text>
+        </View>
+      </TouchableOpacity>
+
       <TouchableOpacity onPress={() => setAddTaskListModalVisible(true)} style={styles.drawerItem}>
-        <Text style={styles.drawerItemText}>Add New List</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <MaterialIcons name="add-circle" size={24} color="black" style={{ marginRight: 10 }} />
+          <Text style={styles.drawerItemText}>Add New List</Text>
+        </View>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate('AllTasks')} style={styles.drawerItem}>
-        <Text style={styles.drawerItemText}>All Tasks</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate('CompletedTasks')} style={styles.drawerItem}>
-        <Text style={styles.drawerItemText}>Completed Tasks</Text>
-      </TouchableOpacity>
-      {taskLists.map(list => (
+
+      {taskLists.map(list => (        
         <TouchableOpacity
           key={list.id}
           onPress={() => navigation.navigate(list.name, { listId: list.id })}
           style={styles.drawerItem}
         >
-          <Text style={styles.drawerItemText}>{list.name}</Text>
-        </TouchableOpacity>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <MaterialIcons name="list" size={24} color="black" style={{ marginRight: 10 }} />
+            <Text style={styles.drawerItemText}>{list.name}</Text>
+          </View>
+        </TouchableOpacity>        
       ))}
+
       <AddTaskListModal
         visible={isAddTaskListModalVisible}
         onClose={() => setAddTaskListModalVisible(false)}
       />
+
     </View>
   );
+  // AddTaskListModal'ı sona yazmak, 
+  // modali kontrol etme ve görsel düzenin sorunsuz işlemesi için yaygın bir yöntemdir.
+  // UI performansı ve görsellik açısından, modallar genellikle diğer öğelere 
+  // müdahale etmeden görünmelidir, bu da sıralamanın önemini artırır.
 }
+
 
 export default function RootLayout() {
   const { taskLists } = useTaskContext();
-
+  
   return (
     <Drawer.Navigator
       initialRouteName="AllTasks"
@@ -72,23 +95,13 @@ export default function RootLayout() {
       }}
     >
       <Drawer.Screen
-        name="AllTasks"
+        name="All Tasks"
         component={Index}
         initialParams={{ listId: 0 }}
-        options={{
-          drawerIcon: ({ color, size }) => (
-            <MaterialIcons name="home" color={color} size={size} />
-          ),
-        }}
       />
       <Drawer.Screen
-        name="CompletedTasks"
+        name="Completed Tasks"
         component={CompletedTasks}
-        options={{
-          drawerIcon: ({ color, size }) => (
-            <MaterialIcons name="list" color={color} size={size} />
-          ),
-        }}
       />
       {taskLists.map(list => (
         <Drawer.Screen
@@ -96,11 +109,6 @@ export default function RootLayout() {
           name={list.name}
           component={Index}
           initialParams={{ listId: list.id }}
-          options={{
-            drawerIcon: ({ color, size }) => (
-              <MaterialIcons name="list" color={color} size={size} />
-            ),
-          }}
         />
       ))}
     </Drawer.Navigator>
