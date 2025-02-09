@@ -176,7 +176,7 @@ export default function Index() {
             filteredTasks.length === 0 ? (
               <View style={styles.imageWrapper}>
                 <Image source={require('@/assets/images/cat.png')} style={styles.image} />
-                <Text style={styles.nothingText}> Nothing to do </Text>
+                <Text style={styles.nothingText}> Nothing to do in </Text>
               </View>
             ) : (
               filteredTasks.map((item) => (
