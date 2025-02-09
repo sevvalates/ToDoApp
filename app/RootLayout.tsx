@@ -28,14 +28,14 @@ function CustomDrawerContent({ navigation }: DrawerContentComponentProps) {
 
       <TouchableOpacity onPress={() => navigation.navigate('Completed Tasks')} style={styles.drawerItem}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <MaterialIcons name="check-circle" size={24} color="black" style={{ marginRight: 10 }} />
+          <MaterialIcons name="check-circle" size={20} color="black" style={{ marginRight: 10 }} />
           <Text style={[{fontWeight: 'bold'},styles.drawerItemText]}>Completed Tasks</Text>
         </View>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => setAddTaskListModalVisible(true)} style={styles.drawerItem}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <MaterialIcons name="format-list-bulleted-add" size={24} color="black" style={{ marginRight: 10 }} />
+          <MaterialIcons name="format-list-bulleted-add" size={20} color="black" style={{ marginRight: 10 }} />
           <Text style={[{fontWeight: 'bold'},styles.drawerItemText]}>Add New List</Text>
         </View>
       </TouchableOpacity>
@@ -95,7 +95,6 @@ export default function RootLayout() {
         headerStyle: { backgroundColor: '#676667', height: 60 }, // Change the top navigator's color
         headerTintColor: '#fff',
         headerTitleStyle: { fontWeight: 'bold', fontSize: 24 },
-        
       }}
     >
       <Drawer.Screen
