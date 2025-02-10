@@ -65,10 +65,14 @@ export default function Index() {
 
       const newTask = { ...taskItem, id: Date.now() };
 
-      if(listId){ // Eğer bir liste seçiliyse, task'ı o listeye ekle                
+      if(listId !== undefined){          
+
+        let id ;
+        if (listId === 0) id = 1;
+        else id = listId;
       
         const updatedTaskLists = taskLists.map(list => {
-          if (list.id === listId) {
+          if (list.id === id) {
             return { ...list, tasks: [...list.tasks, newTask] };
           }
           return list;
@@ -89,20 +93,33 @@ export default function Index() {
         }
         await saveTaskLists(updatedTaskLists);*/
       }
-      else {
-        // Eğer liste seçili değilse, task'ı genel task listesine ekle
-        await addTask(newTask);
-      }
+      /*
+      else if(listId === 0){
+        // Eğer listId 0 ise, task'ı default listeye ekle
+        const updatedTaskLists = taskLists.map(list => {
+          if (list.id === 1) { // Default list id'si 1 olarak varsayılıyor
+            return { ...list, tasks: [...list.tasks, newTask] };
+          }
+          return list;
+        });
+        await saveTaskLists(updatedTaskLists);
+      }*/
 
       setTaskItem({ id: Date.now(), text: '', completed: false });
   }
 
   //TASK TAMAMLAMA İŞARETLEME
   const toggleTaskCompletion = async (taskId: number) => {
-      if (listId) {
+      
+      if (listId !== undefined){
+        let id ;
+        if (listId === 0) id = 1;
+        else id = listId;
 
+        console.log("id: ", id);
+        
         const updatedTaskLists = taskLists.map(list => {
-          if (list.id === listId) {
+          if (list.id === id) {
             return {
               ...list,
               tasks: list.tasks.map(item =>
@@ -128,12 +145,13 @@ export default function Index() {
         await saveTaskLists(updatedTaskLists);
         */
       }
+      /*
       else {
         const updatedTasks = taskItems.map(item =>
           item.id === taskId ? { ...item, completed: !item.completed } : item
         );
         await saveTasks(updatedTasks);
-      }
+      }*/
   };
 
   //TASK SİLME
@@ -149,18 +167,23 @@ export default function Index() {
         {
           text: "Yes",
           onPress: () => {
-            if (listId) {
+            if (listId !== undefined) {
+
+              let id ;
+              if (listId === 0) id = 1;
+              else id = listId;
+
               const updatedTaskLists = taskLists.map(list => {
-                if (list.id === listId) {
+                if (list.id === id) {
                   return { ...list, tasks: list.tasks.filter(task => task.id !== taskId) };
                 }
                 return list;
               });
               saveTaskLists(updatedTaskLists);
-            } else {
+            }/* else {
               const updatedTasks = taskItems.filter(task => task.id !== taskId);
               saveTasks(updatedTasks);
-            }
+            }*/
           }
         }
       ],
