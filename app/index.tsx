@@ -3,16 +3,20 @@ import React, { useEffect, useState } from 'react';
 import Task from "@/components/Task";
 import { useTaskContext } from "@/components/TaskContext";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useRoute, RouteProp } from "@react-navigation/native";
+import { useRoute, RouteProp, useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from '@react-navigation/stack';
 
 type RootStackParamList = {
   Index: { listId?: number };
+  'Add Task': undefined; // undefinedAdd Task ekranına parametre göndermiyoruz
 };
 
+type AddTaskScreenNavigationProp = StackNavigationProp<RootStackParamList,'Add Task'>;
 type IndexScreenRouteProp = RouteProp<RootStackParamList, 'Index'>;
 
 export default function Index() {
   const route = useRoute<IndexScreenRouteProp>();
+  const navigation = useNavigation<AddTaskScreenNavigationProp>();
 
   type TaskItem = {
     id: number;
@@ -221,8 +225,7 @@ export default function Index() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.writeTaskWrapper}
       >
-        <TextInput style={styles.input} placeholder={'Write a Task'} value={taskItem.text} onChangeText={(text) => setTaskItem({ id: taskItem.id, text, completed: false })} />
-        <TouchableOpacity onPress={() => handleAddTask()}>
+        <TouchableOpacity onPress={() => navigation.navigate('Add Task')}> 
           <View style={styles.addWrapper}>
             <MaterialIcons
               name={'add'}
