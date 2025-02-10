@@ -5,14 +5,35 @@ import CompletedTasks from './CompletedTasks';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useState } from 'react';
 import AddTaskListModal from '@/components/AddTaskListModal';
-import { TouchableOpacity, Text, View, StyleSheet, ScrollView } from 'react-native';
+import { TouchableOpacity, Text, View, StyleSheet, ScrollView, Alert } from 'react-native';
 import React from 'react';
 
 const Drawer = createDrawerNavigator();
 
 function CustomDrawerContent({ navigation }: DrawerContentComponentProps) {
-  const { taskLists } = useTaskContext();
-  const [isAddTaskListModalVisible, setAddTaskListModalVisible] = useState(false); //"Add new list" modalını açıp kapatma
+  const { taskLists, saveTaskLists } = useTaskContext();
+  const [isAddTaskListModalVisible, setAddTaskListModalVisible] = useState(false);
+
+  const handleDeleteTaskList = async (listId: number) => {
+    Alert.alert(
+      "Delete List",
+      "Are you sure you want to delete this list?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        {
+          text: "Yes",
+          onPress: async () => {
+            const updatedTaskLists = taskLists.filter(list => list.id !== listId);
+            await saveTaskLists(updatedTaskLists);
+          }
+        }
+      ],
+      { cancelable: true }
+    );
+  };
 
   return (
 
@@ -44,6 +65,7 @@ function CustomDrawerContent({ navigation }: DrawerContentComponentProps) {
         <TouchableOpacity
           key={list.id}
           onPress={() => navigation.navigate(list.name, { listId: list.id })}
+          onLongPress={() => list.id !== 1 && handleDeleteTaskList(list.id)} // Prevent deletion of the default list
           style={styles.drawerItem}
         >
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
