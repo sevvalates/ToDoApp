@@ -31,7 +31,7 @@ function CustomDrawerContent({ navigation }: DrawerContentComponentProps) {
           }
         }
       ],
-      { cancelable: true }
+      { cancelable: true } //Kullanıcı alert kutusunun dışına dokunarak da iptal edebilir.
     );
   };
 
