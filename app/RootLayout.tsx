@@ -144,7 +144,7 @@ export default function AppNavigator() {
   return (
       <Stack.Navigator>
         <Stack.Screen name="Root" component={RootLayout} options={{ headerShown: false }} />
-        <Stack.Screen name="Add Task" component={AddTaskScreen} />
+        <Stack.Screen name="Add/Edit Task" component={AddTaskScreen} />
       </Stack.Navigator>
   );
 }

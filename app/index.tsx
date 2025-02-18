@@ -7,12 +7,21 @@ import { useRoute, RouteProp, useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from '@react-navigation/stack';
 import * as Notifications from 'expo-notifications';
 
-type RootStackParamList = {
-  Index: { listId?: number };
-  'Add Task': undefined; // undefinedAdd Task ekranına parametre göndermiyoruz
+type TaskItem = {
+  id: number;
+  listId: number;
+  text: string;
+  completed: boolean;
+  date?: Date | null;
+  time?: Date | null;
 };
 
-type AddTaskScreenNavigationProp = StackNavigationProp<RootStackParamList,'Add Task'>;
+type RootStackParamList = {
+  Index: { listId?: number };
+  'Add/Edit Task': { task?: TaskItem; listId?: number };
+};
+
+type AddTaskScreenNavigationProp = StackNavigationProp<RootStackParamList,'Add/Edit Task'>;
 //type IndexnNavigationProp = StackNavigationProp<RootStackParamList,'Index'>;
 
 type IndexScreenRouteProp = RouteProp<RootStackParamList, 'Index'>;
@@ -21,15 +30,9 @@ export default function Index() {
   const route = useRoute<IndexScreenRouteProp>();
   const navigation = useNavigation<AddTaskScreenNavigationProp>();
 
-  type TaskItem = {
-    id: number;
-    text: string;
-    completed: boolean;
-    date?: Date | null;
-    time?: Date | null;
-  };
+
   
-  const [taskItem, setTaskItem] = useState<TaskItem>({ id: Date.now(), text: '', completed: false });
+  const [taskItem, setTaskItem] = useState<TaskItem>({ id: Date.now(), listId: 1, text: '', completed: false });
   const { taskItems, saveTasks, addTask, deleteTask, saveTaskLists, taskLists } = useTaskContext();
   const [filteredTasks, setFilteredTasks] = useState<TaskItem[]>([]);
 
@@ -160,7 +163,7 @@ export default function Index() {
         await saveTaskLists(updatedTaskLists);
       }*/
 
-      setTaskItem({ id: Date.now(), text: '', completed: false });
+      setTaskItem({ id: Date.now(),listId: 1, text: '', completed: false });
   }
 
   //TASK TAMAMLAMA İŞARETLEME
@@ -246,6 +249,11 @@ export default function Index() {
     );
   };
 
+  //TASK DÜZENLEMEYE YÖNLENDİRME
+  const handleEditTask = (task: TaskItem) => {
+    navigation.navigate('Add/Edit Task', { task });
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.tasksWrapper}>
@@ -258,7 +266,7 @@ export default function Index() {
               </View>
             ) : (
               filteredTasks.map((item) => (
-                <TouchableOpacity key={item.id} onLongPress={() => handleDeleteTask(item.id)}>
+                <TouchableOpacity key={item.id} onPress={() => handleEditTask(item)} onLongPress={() => handleDeleteTask(item.id)}>
                   <Task
                     key={item.id}
                     text={item.text}
@@ -278,7 +286,7 @@ export default function Index() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.writeTaskWrapper}
       >
-        <TouchableOpacity onPress={() => navigation.navigate('Add Task')}> 
+        <TouchableOpacity onPress={() => navigation.navigate('Add/Edit Task',{listId})}> 
           <View style={styles.addWrapper}>
             <MaterialIcons
               name={'add'}

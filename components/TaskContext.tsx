@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type TaskItem = {
   id: number;
+  listId: number;
   text: string;
   completed: boolean;
   date?: Date | null ;

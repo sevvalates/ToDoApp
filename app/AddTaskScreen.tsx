@@ -1,10 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, Platform, ToastAndroid, Alert, ScrollView } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTaskContext } from '@/components/TaskContext';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import * as Notifications from 'expo-notifications';
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+
+type TaskItem = {
+  id: number;
+  listId: number;
+  text: string;
+  completed: boolean;
+  date?: Date | null;
+  time?: Date | null;
+};
+
+type RootStackParamList = {
+  'Add/Edit Task': { task?: TaskItem; listId?: number };
+};
+
+type AddTaskScreenRouteProp = RouteProp<RootStackParamList, 'Add/Edit Task'>;
 
 export default function AddTaskScreen() {
   const [taskText, setTaskText] = useState('');
@@ -18,6 +33,22 @@ export default function AddTaskScreen() {
   const [isListVisible, setIsListVisible] = useState(false); // State to control dropdown visibility
   const { taskLists, saveTaskLists } = useTaskContext();
   const navigation = useNavigation();
+  const route = useRoute<AddTaskScreenRouteProp>();
+  const taskToEdit = route.params?.task;
+  const initialListId = route.params?.listId ?? null;
+
+
+  useEffect(() => {
+    if (taskToEdit) {
+      setTaskText(taskToEdit.text);
+      setSelectedDate(taskToEdit.date ? new Date(taskToEdit.date) : null);
+      setSelectedTime(taskToEdit.time ? new Date(taskToEdit.time) : null);
+      setSelectedListId(taskToEdit.listId || null);
+    }
+    else {
+      setSelectedListId(initialListId);
+    }
+  }, [taskToEdit]);
 
   const handleAddTask = async () => {
     if (taskText.trim() === '') {
@@ -46,14 +77,16 @@ export default function AddTaskScreen() {
       return;
     }
 
-    //const newTask = { id: Date.now(), text: taskText, completed: false, date: selectedDate };
+
     const newTask = { 
-      id: Date.now(), 
+      id: taskToEdit ? taskToEdit.id : Date.now(), 
+      listId: selectedListId,
       text: taskText, 
-      completed: false,
+      completed: taskToEdit ? taskToEdit.completed : false,
       date: selectedDate, 
       time: selectedTime 
     };
+
 
     console.log("TASK CNM",selectedDate);
     console.log("TASK CNM",selectedTime);
@@ -83,8 +116,37 @@ export default function AddTaskScreen() {
 
     console.log("aa",selectedDate);
     console.log("aa",selectedTime);
-
+/*
     const updatedTaskLists = taskLists.map(list => {
+      if (list.id === selectedListId) { //bunun içiiii???
+        const updatedTasks = taskToEdit
+          ? list.tasks.map(task => task.id === taskToEdit.id ? newTask : task)
+          : [...list.tasks, newTask];
+        return { ...list, tasks: updatedTasks };
+
+         //return { ...list, tasks: [...list.tasks, newTask] }; //bu vardı sadece
+      }
+      return list;
+    });
+  */
+ 
+
+    /**
+    * Eğer görev aynı listede kalıyorsa (yani selectedListId === taskToEdit.listId), önce eski versiyonunu siliyoruz.
+    * sonra güncellenmiş halini ekliyoruz.
+    * Böylece, aynı listede güncellenmiş versiyonu tekrar eklenmiş oluyor ve eski sürüm çakışma yaratmıyor.
+    */
+
+   // Eğer taskToEdit eski listeden sil
+    let updatedTaskLists = taskLists.map(list => {
+      if (taskToEdit && list.id === taskToEdit.listId) {
+        return { ...list, tasks: list.tasks.filter(task => task.id !== taskToEdit.id) };
+      }
+      return list;
+    });
+
+    // editlenen Yeni hali ya da yeni taskı listeye ekle
+    updatedTaskLists = updatedTaskLists.map(list => {
       if (list.id === selectedListId) {
         return { ...list, tasks: [...list.tasks, newTask] };
       }
@@ -102,7 +164,8 @@ export default function AddTaskScreen() {
       setShowTimePicker(true);
     }
   };
-/*
+
+  /*
   const handleTimeChange = (event: any, time?: Date) => {
     setShowTimePicker(false);
     if (time && selectedDate) {
@@ -292,8 +355,8 @@ const styles = StyleSheet.create({
   },
 });
 
-
-      /* List dropdown 
+	
+      /* List dropdown
       {taskLists.map(list => (
         <TouchableOpacity
           key={list.id}
