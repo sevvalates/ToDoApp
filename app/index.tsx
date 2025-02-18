@@ -5,6 +5,7 @@ import { useTaskContext } from "@/components/TaskContext";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useRoute, RouteProp, useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from '@react-navigation/stack';
+import * as Notifications from 'expo-notifications';
 
 type RootStackParamList = {
   Index: { listId?: number };
@@ -12,6 +13,8 @@ type RootStackParamList = {
 };
 
 type AddTaskScreenNavigationProp = StackNavigationProp<RootStackParamList,'Add Task'>;
+//type IndexnNavigationProp = StackNavigationProp<RootStackParamList,'Index'>;
+
 type IndexScreenRouteProp = RouteProp<RootStackParamList, 'Index'>;
 
 export default function Index() {
@@ -22,11 +25,59 @@ export default function Index() {
     id: number;
     text: string;
     completed: boolean;
+    date?: Date | null;
+    time?: Date | null;
   };
   
   const [taskItem, setTaskItem] = useState<TaskItem>({ id: Date.now(), text: '', completed: false });
   const { taskItems, saveTasks, addTask, deleteTask, saveTaskLists, taskLists } = useTaskContext();
   const [filteredTasks, setFilteredTasks] = useState<TaskItem[]>([]);
+
+  // Bildirim izinlerini yapılandır
+  useEffect(() => {
+    const configureNotifications = async () => {
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+
+      if (finalStatus !== 'granted') {
+        console.log('Bildirim izni verilmedi!');
+        return;
+      }
+
+      console.log('Bildirim izni verildi!');
+    };
+
+    configureNotifications();
+    configureNotificationChannel();
+  }, []);
+
+  useEffect(() => {
+    const subscription = Notifications.addNotificationResponseReceivedListener(response => {
+      console.log('Bildirime tıklandı:', response);
+      // Örneğin, görev ekranına yönlendirme yapabilirsiniz
+      //navigation.navigate('Index');
+    });
+  
+    return () => subscription.remove(); // Temizleme
+  }, []);
+
+  // Android için bildirim kanalı oluştur
+  const configureNotificationChannel = () => {
+    if (Platform.OS === 'android') {
+      Notifications.setNotificationChannelAsync('reminders', {
+        name: 'Task Reminders',
+        importance: Notifications.AndroidImportance.HIGH,
+        sound: 'default',
+        vibrationPattern: [0, 250, 250, 250],
+      });
+    }
+  };
+
 
   // Route'dan gelen listId'yi al
   const listId = route.params?.listId;
@@ -213,6 +264,8 @@ export default function Index() {
                     text={item.text}
                     completed={item.completed}
                     onToggleComplete={() => toggleTaskCompletion(item.id)}
+                    date={item?.date}
+                    time={item?.time}
                   />
                 </TouchableOpacity>
               ))

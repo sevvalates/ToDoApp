@@ -3,11 +3,15 @@ import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, Platform, 
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTaskContext } from '@/components/TaskContext';
 import { useNavigation } from '@react-navigation/native';
+import * as Notifications from 'expo-notifications';
+
 
 export default function AddTaskScreen() {
   const [taskText, setTaskText] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedTime, setSelectedTime] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
   const [selectedListId, setSelectedListId] = useState<number | null>(null);
   const { taskLists, saveTaskLists } = useTaskContext();
   const navigation = useNavigation();
@@ -39,7 +43,43 @@ export default function AddTaskScreen() {
       return;
     }
 
-    const newTask = { id: Date.now(), text: taskText, completed: false, date: selectedDate };
+    //const newTask = { id: Date.now(), text: taskText, completed: false, date: selectedDate };
+    const newTask = { 
+      id: Date.now(), 
+      text: taskText, 
+      completed: false,
+      date: selectedDate, 
+      time: selectedTime 
+    };
+
+    console.log("TASK CNM",selectedDate);
+    console.log("TASK CNM",selectedTime);
+
+
+    // Bildirim tarihini hesapla
+    if (selectedDate && selectedTime) {
+      const notificationTime = new Date(selectedDate);
+      notificationTime.setHours(selectedTime.getHours());
+      notificationTime.setMinutes(selectedTime.getMinutes());
+  
+      // Bildirimi planla
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: 'Task Reminder',
+          body: `Reminder for task: ${taskText}`,
+          sound: true,
+          vibrate: [0, 250, 250, 250],
+        },
+        trigger: {
+          type: Notifications.SchedulableTriggerInputTypes.DATE,
+          date: notificationTime,
+          channelId: 'reminders',
+        }
+      });
+    }
+
+    console.log("aa",selectedDate);
+    console.log("aa",selectedTime);
 
     const updatedTaskLists = taskLists.map(list => {
       if (list.id === selectedListId) {
@@ -51,6 +91,41 @@ export default function AddTaskScreen() {
     await saveTaskLists(updatedTaskLists);
     navigation.goBack();
   };
+  const handleDateChange = (event: any, date?: Date) => {
+    setShowDatePicker(false);
+    if (date) {
+      setSelectedDate(date);
+      setShowTimePicker(true);
+    }
+  };
+/*
+  const handleTimeChange = (event: any, time?: Date) => {
+    setShowTimePicker(false);
+    if (time && selectedDate) {
+      const newDate = new Date(selectedDate);
+      newDate.setHours(time.getHours());
+      newDate.setMinutes(time.getMinutes());
+      setSelectedDate(newDate);
+    }
+    console.log("bbb",selectedDate);
+    console.log("bb",selectedTime);
+  };
+*/
+
+const handleTimeChange = (event: any, time?: Date) => {
+  setShowTimePicker(false);
+  if (time  && selectedDate) {
+    setSelectedTime(time); // selectedTime'i güncelle
+
+    // selectedDate ve selectedTime'i birleştir
+    const combinedDateTime = new Date(selectedDate);
+    combinedDateTime.setHours(time.getHours());
+    combinedDateTime.setMinutes(time.getMinutes());
+    setSelectedDate(combinedDateTime); // Birleştirilmiş tarih-saat'i selectedDate'e ata
+  }
+  console.log("Selected Time:", time);
+  console.log("Combined Date and Time:", selectedDate);
+};
 
   return (
     <View style={styles.container}>
@@ -64,17 +139,22 @@ export default function AddTaskScreen() {
 
       <Text style={styles.label}>Date</Text>
       <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.datePicker}>
-        <Text>{selectedDate.toDateString()}</Text>
+        <Text>{selectedDate ? selectedDate.toLocaleString() : "Select Date & Time"}</Text>
       </TouchableOpacity>
       {showDatePicker && (
         <DateTimePicker
-          value={selectedDate}
+          value={selectedDate || new Date()}
           mode="date"
           display="default"
-          onChange={(event, date) => {
-            setShowDatePicker(false);
-            if (date) setSelectedDate(date);
-          }}
+          onChange={handleDateChange}
+        />
+      )}
+      {showTimePicker && (
+        <DateTimePicker
+          value={selectedDate || new Date()}
+          mode="time"
+          display="default"
+          onChange={handleTimeChange}
         />
       )}
 

@@ -6,9 +6,14 @@ type Props = {
     text: string;
     completed: boolean;
     onToggleComplete: () => void;
+    date?: Date | null ;
+    time?: Date | null ;
 };
   
-export default function Task({text,completed,onToggleComplete}: Props){
+export default function Task({text,completed,onToggleComplete,date,time}: Props){
+
+    console.log("taskd",date);
+    console.log(time);
 
     return (
         <View style={styles.item}>
@@ -23,6 +28,8 @@ export default function Task({text,completed,onToggleComplete}: Props){
                 <Text style={[styles.itemText, completed && styles.completedText]}>
                     {text}
                 </Text>
+                {date && <Text style={styles.dateText}>{date.toDateString()}</Text>}
+                {time && <Text style={styles.timeText}>{time.toTimeString().slice(0, 5)}</Text>}
             </View>
         </View>
     );
@@ -72,5 +79,15 @@ const styles = StyleSheet.create({
     completedText: {
         textDecorationLine: 'line-through',
         color: '#808080',
+    },
+    dateText: {
+        fontSize: 12,
+        color: '#888',
+        marginLeft: 5,
+    },
+    timeText: {
+        fontSize: 12,
+        color: '#888',
+        marginLeft: 5,
     },
 });

@@ -5,6 +5,8 @@ type TaskItem = {
   id: number;
   text: string;
   completed: boolean;
+  date?: Date | null ;
+  time?: Date | null ;
 };
 
 type TaskList = {
@@ -58,7 +60,18 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }
           setTaskItems(JSON.parse(storedTasks));
         }
         if (storedTaskLists) {
-          setTaskLists(JSON.parse(storedTaskLists));
+
+          const parsedTaskLists = JSON.parse(storedTaskLists).map((list:TaskList) => ({
+            ...list,
+            tasks: list.tasks.map((task :TaskItem) => ({
+              ...task,
+              date: task.date ? new Date(task.date) : null,
+              time: task.time ? new Date(task.time) : null,
+            })),
+          }));
+
+
+          setTaskLists(parsedTaskLists);
         } else {
           const defaultList = { id: 1, name: 'Default List', tasks: [] };
           setTaskLists([defaultList]);
@@ -84,7 +97,17 @@ export const TaskProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }
 
   const saveTaskLists = async (newTaskLists: TaskList[]) => {
     try {
-      await AsyncStorage.setItem('taskLists', JSON.stringify(newTaskLists));
+
+      const serializedTaskLists = newTaskLists.map(list => ({
+        ...list,
+        tasks: list.tasks.map(task => ({
+          ...task,
+          date: task.date ? task.date.toISOString() : null,
+          time: task.time ? task.time.toISOString() : null,
+        })),
+      }));
+
+      await AsyncStorage.setItem('taskLists', JSON.stringify(serializedTaskLists));
       setTaskLists(newTaskLists);
     } catch (error) {
       console.log("Veriler kaydedilemedi: ", error);
