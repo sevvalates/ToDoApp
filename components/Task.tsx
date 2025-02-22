@@ -8,6 +8,7 @@ type Props = {
     onToggleComplete: () => void;
     date?: Date | null ;
     time?: Date | null ;
+    notificationId?: string;
 };
   
 export default function Task({text,completed,onToggleComplete,date,time}: Props){

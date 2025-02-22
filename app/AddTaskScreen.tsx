@@ -13,6 +13,7 @@ type TaskItem = {
   completed: boolean;
   date?: Date | null;
   time?: Date | null;
+  notificationId?: string;
 };
 
 type RootStackParamList = {
@@ -22,6 +23,8 @@ type RootStackParamList = {
 type AddTaskScreenRouteProp = RouteProp<RootStackParamList, 'Add/Edit Task'>;
 
 export default function AddTaskScreen() {
+  const [selectedNotificationId, setSelectedNotificationId] = useState<string | undefined>(undefined);
+
   const [taskText, setTaskText] = useState('');
   //const [selectedDate, setSelectedDate] = useState(new Date());
   //const [selectedTime, setSelectedTime] = useState(new Date());
@@ -47,6 +50,7 @@ export default function AddTaskScreen() {
       setSelectedDate(taskToEdit.date ? new Date(taskToEdit.date) : null);
       setSelectedTime(taskToEdit.time ? new Date(taskToEdit.time) : null);
       setSelectedListId(taskToEdit.listId || null);
+      setSelectedNotificationId(taskToEdit.notificationId || undefined);
     }
     else {
       setSelectedListId(initialListId);
@@ -84,13 +88,14 @@ export default function AddTaskScreen() {
     }
 
 
-    const newTask = { 
+    const newTask: TaskItem = { 
       id: taskToEdit ? taskToEdit.id : Date.now(), 
-      listId: selectedListId,
+      listId: selectedListId!,
       text: taskText, 
       completed: taskToEdit ? taskToEdit.completed : false,
       date: selectedDate, 
-      time: selectedTime 
+      time: selectedTime,
+      notificationId: selectedNotificationId,
     };
 
 
@@ -105,7 +110,7 @@ export default function AddTaskScreen() {
       notificationTime.setMinutes(selectedTime.getMinutes());
   
       // Bildirimi planla
-      await Notifications.scheduleNotificationAsync({
+      const id = await Notifications.scheduleNotificationAsync({
         content: {
           title: 'Task Reminder',
           body: `Reminder for task: ${taskText}`,
@@ -118,6 +123,13 @@ export default function AddTaskScreen() {
           channelId: 'reminders',
         }
       });
+      setSelectedNotificationId(id); // Bildirim ID'sini sakla
+      newTask.notificationId = id; // Bildirim ID'sini yeni göreve ekle
+    }
+    else if (selectedNotificationId) {
+      // Eğer tarih ve saat silindiyse, bildirimi iptal et
+      await cancelNotification();
+      newTask.notificationId = undefined; // Bildirim ID'sini kaldır
     }
 
     console.log("aa",selectedDate);
@@ -160,7 +172,12 @@ export default function AddTaskScreen() {
     });
 
     await saveTaskLists(updatedTaskLists);
-    navigation.goBack();
+    //navigation.goBack();
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      console.log("Geri dönülecek ekran yok!");
+    }
   };
 
   const handleDateChange = (event: any, date?: Date) => {
@@ -200,6 +217,28 @@ const handleTimeChange = (event: any, time?: Date) => {
   console.log("Combined Date and Time:", selectedDate);
 };
 
+const cancelNotification = async () => {
+  if (selectedNotificationId) {
+    console.log("İptal edilecek bildirim ID:", selectedNotificationId);
+    await Notifications.cancelScheduledNotificationAsync(selectedNotificationId);
+    setSelectedNotificationId(undefined);
+    console.log("Bildirim iptal edildi");
+  } else {
+    console.log("İptal edilecek bir bildirim yok");
+  }
+};
+
+const clearDate = async () => {
+  setSelectedDate(null);
+  setSelectedTime(null);
+  //await cancelNotification();
+};
+
+const clearTime = async () => {
+  setSelectedTime(null);
+//  if(!selectedDate) await cancelNotification();
+};
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
 
@@ -214,36 +253,49 @@ const handleTimeChange = (event: any, time?: Date) => {
 
       <Text style={styles.label}>Reminder: Date & Time </Text>
 
-      <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.datePicker}>
-          <Text>{selectedDate ? selectedDate.toLocaleDateString() : "Select Date"}</Text>
-          <MaterialIcons name="calendar-today" size={24} color="black" style={styles.icon} />
-      </TouchableOpacity>
+      <View style={styles.dateTimeRow}>
+          <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.datePicker}>
+            <Text>{selectedDate ? selectedDate.toLocaleDateString() : "Select Date"}</Text>
+            <MaterialIcons name="calendar-today" size={24} color="black" style={styles.icon} />
+          </TouchableOpacity>
+          {selectedDate && (
+            <TouchableOpacity onPress={clearDate} style={styles.clearButton}>
+              <MaterialIcons name="cancel" size={24} color="red" />
+            </TouchableOpacity>
+          )}
+        </View>
 
-      {showDatePicker && (
-        <DateTimePicker
-          value={selectedDate || new Date()}
-          mode="date"
-          display="default"
-          onChange={handleDateChange}
-        />
-      )}
+        {showDatePicker && (
+          <DateTimePicker
+            value={selectedDate || new Date()}
+            mode="date"
+            display="default"
+            onChange={handleDateChange}
+          />
+        )}
 
-      {selectedDate && (
-        <TouchableOpacity onPress={() => setShowTimePicker(true)} style={styles.datePicker}>
-          <Text>{selectedTime ? selectedTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "Select Time"}</Text>
-          <MaterialIcons name="access-time" size={24} color="black" style={styles.icon} />
+        {selectedDate && (
+          <View style={styles.dateTimeRow}>
+            <TouchableOpacity onPress={() => setShowTimePicker(true)} style={styles.datePicker}>
+              <Text>{selectedTime ? selectedTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "Select Time"}</Text>
+              <MaterialIcons name="access-time" size={24} color="black" style={styles.icon} />
+            </TouchableOpacity>
+            {selectedTime && (
+              <TouchableOpacity onPress={clearTime} style={styles.clearButton}>
+                <MaterialIcons name="cancel" size={24} color="red" />
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
 
-        </TouchableOpacity>
-      )}
-      
-      {showTimePicker && (
-        <DateTimePicker
-          value={selectedDate || new Date()}
-          mode="time"
-          display="default"
-          onChange={handleTimeChange}
-        />
-      )}
+        {showTimePicker && (
+          <DateTimePicker
+            value={selectedDate || new Date()}
+            mode="time"
+            display="default"
+            onChange={handleTimeChange}
+          />
+        )}
 
       <Text style={styles.label}>List</Text>
 
@@ -306,7 +358,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     marginBottom: 20,
-
+    width: '92%',
     flexDirection: 'row', // Ensure date and icon are aligned horizontally
     justifyContent: 'space-between', // Align text and icon to opposite ends
     alignItems: 'center', // Vertically center the items
@@ -361,6 +413,15 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 20,
     overflow: 'scroll',
+  },
+  dateTimeRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  clearButton: {
+    marginLeft: 10,
+
   },
 });
 

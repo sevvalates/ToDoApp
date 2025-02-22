@@ -8,6 +8,7 @@ type TaskItem = {
   completed: boolean;
   date?: Date | null ;
   time?: Date | null ;
+  notificationId?: string;
 };
 
 type TaskList = {
