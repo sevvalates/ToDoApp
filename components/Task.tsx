@@ -12,9 +12,6 @@ type Props = {
   
 export default function Task({text,completed,onToggleComplete,date,time}: Props){
 
-    console.log("taskd",date);
-    console.log(time);
-
     return (
         <View style={styles.item}>
             <View style={styles.itemLeft}>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, Platform, ToastAndroid, Alert, ScrollView } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, Platform, ToastAndroid, Alert, ScrollView, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTaskContext } from '@/components/TaskContext';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
@@ -39,6 +39,9 @@ export default function AddTaskScreen() {
 
 
   useEffect(() => {
+
+    console.log("GİRDİ");
+
     if (taskToEdit) {
       setTaskText(taskToEdit.text);
       setSelectedDate(taskToEdit.date ? new Date(taskToEdit.date) : null);
@@ -51,6 +54,7 @@ export default function AddTaskScreen() {
   }, [taskToEdit]);
 
   const handleAddTask = async () => {
+
     if (taskText.trim() === '') {
       if (Platform.OS === 'android') {
         ToastAndroid.showWithGravity(
@@ -64,7 +68,9 @@ export default function AddTaskScreen() {
       return;
     }
 
-    if (selectedListId === null) {
+    console.log("BBBBBBBBBBBBBBBBBBBBB",selectedListId);
+
+    if (selectedListId === null || selectedListId === 0) {
       if (Platform.OS === 'android') {
         ToastAndroid.showWithGravity(
           "Please select a list",
@@ -195,6 +201,8 @@ const handleTimeChange = (event: any, time?: Date) => {
 };
 
   return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+
     <View style={styles.container}>
       <Text style={styles.label}>Task</Text>
       <TextInput
@@ -264,11 +272,12 @@ const handleTimeChange = (event: any, time?: Date) => {
         </ScrollView>
       )}
 
-
       <TouchableOpacity onPress={handleAddTask} style={styles.addButton}>
         <Text style={styles.addButtonText}>Save Task</Text>
       </TouchableOpacity>
     </View>
+    </TouchableWithoutFeedback>
+
   );
 }
 

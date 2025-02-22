@@ -88,7 +88,6 @@ export default function Index() {
   // ListId'ye göre task'ları filtrele
   useEffect(() => {
     if (listId) {
-      console.log("listId: ", listId);      
       const selectedList = taskLists.find(list => list.id === listId);
       if (selectedList) {
         setFilteredTasks(selectedList.tasks);
@@ -173,8 +172,6 @@ export default function Index() {
         let id ;
         if (listId === 0) id = 1;
         else id = listId;
-
-        console.log("id: ", id);
         
         const updatedTaskLists = taskLists.map(list => {
           if (list.id === id) {
