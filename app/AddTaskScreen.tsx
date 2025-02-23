@@ -17,7 +17,7 @@ type TaskItem = {
 };
 
 type RootStackParamList = {
-  'Add/Edit Task': { task?: TaskItem; listId?: number };
+  'Add/Edit Task': { taskId?: number; listId?: number };
 };
 
 type AddTaskScreenRouteProp = RouteProp<RootStackParamList, 'Add/Edit Task'>;
@@ -37,14 +37,15 @@ export default function AddTaskScreen() {
   const { taskLists, saveTaskLists } = useTaskContext();
   const navigation = useNavigation();
   const route = useRoute<AddTaskScreenRouteProp>();
-  const taskToEdit = route.params?.task;
+ // const taskToEdit = route.params?.task;
+  const taskId = route.params?.taskId; // Fetch taskId from the route parameter
   const initialListId = route.params?.listId ?? null;
 
 
   useEffect(() => {
 
     console.log("GİRDİ");
-
+/*
     if (taskToEdit) {
       setTaskText(taskToEdit.text);
       setSelectedDate(taskToEdit.date ? new Date(taskToEdit.date) : null);
@@ -52,10 +53,26 @@ export default function AddTaskScreen() {
       setSelectedListId(taskToEdit.listId || null);
       setSelectedNotificationId(taskToEdit.notificationId || undefined);
     }
-    else {
+*/
+  // Fetch task if taskId is provided
+  if (taskId) {
+    const task = taskLists
+      .flatMap(list => list.tasks) // Flatten all tasks from all lists
+      .find(t => t.id === taskId); // Find task by taskId
+    
+    if (task) {
+      setTaskText(task.text);
+      setSelectedDate(task.date ? new Date(task.date) : null);
+      setSelectedTime(task.time ? new Date(task.time) : null);
+      setSelectedListId(task.listId || null);
+      setSelectedNotificationId(task.notificationId || undefined);
+    }
+  } else {
       setSelectedListId(initialListId);
     }
-  }, [taskToEdit]);
+  //}, [taskToEdit]);
+  }, [taskId, taskLists, initialListId]);
+
 
   const handleAddTask = async () => {
 
@@ -87,7 +104,7 @@ export default function AddTaskScreen() {
       return;
     }
 
-
+/*
     const newTask: TaskItem = { 
       id: taskToEdit ? taskToEdit.id : Date.now(), 
       listId: selectedListId!,
@@ -97,7 +114,17 @@ export default function AddTaskScreen() {
       time: selectedTime,
       notificationId: selectedNotificationId,
     };
+*/
 
+    const newTask: TaskItem = { 
+      id: taskId || Date.now(), // Use taskId for editing or generate a new id
+      listId: selectedListId!,
+      text: taskText, 
+      completed: taskId ? taskLists.flatMap(list => list.tasks).find(t => t.id === taskId)?.completed || false : false,
+      date: selectedDate, 
+      time: selectedTime,
+      notificationId: selectedNotificationId,
+    };
 
     console.log("TASK CNM",selectedDate);
     console.log("TASK CNM",selectedTime);
@@ -154,11 +181,32 @@ export default function AddTaskScreen() {
     * sonra güncellenmiş halini ekliyoruz.
     * Böylece, aynı listede güncellenmiş versiyonu tekrar eklenmiş oluyor ve eski sürüm çakışma yaratmıyor.
     */
-
+/*
    // Eğer taskToEdit eski listeden sil
     let updatedTaskLists = taskLists.map(list => {
       if (taskToEdit && list.id === taskToEdit.listId) {
         return { ...list, tasks: list.tasks.filter(task => task.id !== taskToEdit.id) };
+      }
+      return list;
+    });
+
+    // editlenen Yeni hali ya da yeni taskı listeye ekle
+    updatedTaskLists = updatedTaskLists.map(list => {
+      if (list.id === selectedListId) {
+        return { ...list, tasks: [...list.tasks, newTask] };
+      }
+      return list;
+    });
+
+*/
+
+    let updatedTaskLists = taskLists.map(list => {
+      // Find the task being edited
+      if (taskId) {
+        // Remove the task from its current list
+        if (list.tasks.some(task => task.id === taskId)) {
+          return { ...list, tasks: list.tasks.filter(task => task.id !== taskId) };
+        }
       }
       return list;
     });

@@ -19,7 +19,7 @@ type TaskItem = {
 
 type RootStackParamList = {
   Index: { listId?: number };
-  'Add/Edit Task': { task?: TaskItem; listId?: number };
+  'Add/Edit Task': { taskId?: number; listId?: number };
 };
 
 type AddTaskScreenNavigationProp = StackNavigationProp<RootStackParamList,'Add/Edit Task'>;
@@ -223,10 +223,13 @@ export default function Index() {
         {
           text: "Yes",
           onPress: () => {
+            //console.log("listId",listId);
             if (listId !== undefined) {
-
               let id ;
-              if (listId === 0) id = 1;
+              if (listId === 0){
+                //find the list id of the task
+                id = taskLists.find(list => list.tasks.some(task => task.id === taskId))?.id;
+              }
               else id = listId;
 
               const updatedTaskLists = taskLists.map(list => {
@@ -249,7 +252,7 @@ export default function Index() {
 
   //TASK DÜZENLEMEYE YÖNLENDİRME
   const handleEditTask = (task: TaskItem) => {
-    navigation.navigate('Add/Edit Task', { task });
+    navigation.navigate('Add/Edit Task', { taskId : task.id , listId : task.listId });
   };
 
   return (
