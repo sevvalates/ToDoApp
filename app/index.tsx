@@ -232,6 +232,13 @@ export default function Index() {
               }
               else id = listId;
 
+              let notificationId = taskLists.find(list => list.id === id)?.tasks.find(task => task.id === taskId)?.notificationId;
+              if(notificationId){
+                console.log("İptal edilecek bildirim ID:", notificationId);
+                Notifications.cancelScheduledNotificationAsync(notificationId);
+                console.log("Silinen taskın Bildirim iptal edildi");
+              }
+
               const updatedTaskLists = taskLists.map(list => {
                 if (list.id === id) {
                   return { ...list, tasks: list.tasks.filter(task => task.id !== taskId) };
