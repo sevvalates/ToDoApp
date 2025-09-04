@@ -6,41 +6,31 @@ type Props = {
     text: string;
     completed: boolean;
     onToggleComplete: () => void;
+    date?: Date | null ;
+    time?: Date | null ;
+    notificationId?: string;
 };
   
-export default function Task({text,completed,onToggleComplete}: Props){
-/*
-return (
-    <View style={styles.item}>
-        <View style={styles.itemLeft}>
-            <TouchableOpacity 
-                style={[styles.square, completed && styles.completedSquare]} 
-                onPress={onToggleComplete}
-            />
-            <Text style={[styles.itemText, completed && styles.completedText]}>
-                {text}
-            </Text>
-        </View>
-    </View>
-);
-*/  
+export default function Task({text,completed,onToggleComplete,date,time}: Props){
 
-return (
-    <View style={styles.item}>
-        <View style={styles.itemLeft}>
-            <TouchableOpacity onPress={onToggleComplete}>
-                <MaterialIcons 
-                    name={completed ? 'check-box' : 'check-box-outline-blank'} 
-                    size={30} 
-                    color={completed ? '#4CAF50' : '#55BCF6'} 
-                />
-            </TouchableOpacity>
-            <Text style={[styles.itemText, completed && styles.completedText]}>
-                {text}
-            </Text>
+    return (
+        <View style={styles.item}>
+            <View style={styles.itemLeft}>
+                <TouchableOpacity onPress={onToggleComplete}>
+                    <MaterialIcons 
+                        name={completed ? 'check-box' : 'check-box-outline-blank'} 
+                        size={30} 
+                        color={completed ? '#4CAF50' : '#55BCF6'} 
+                    />
+                </TouchableOpacity>
+                <Text style={[styles.itemText, completed && styles.completedText]}>
+                    {text}
+                </Text>
+                {date && <Text style={styles.dateText}>{date.toDateString()}</Text>}
+                {time && <Text style={styles.timeText}>{time.toTimeString().slice(0, 5)}</Text>}
+            </View>
         </View>
-    </View>
-);
+    );
 
 }
 
@@ -68,9 +58,10 @@ const styles = StyleSheet.create({
         marginRight: 15,
     },
     itemText:{
-        maxWidth: '80%',
+        maxWidth: '90%',
         marginLeft: 5,
         fontSize: 16,
+        marginRight: 5,
     },
     circular: {
         width: 12,
@@ -86,5 +77,15 @@ const styles = StyleSheet.create({
     completedText: {
         textDecorationLine: 'line-through',
         color: '#808080',
+    },
+    dateText: {
+        fontSize: 12,
+        color: '#888',
+        marginLeft: 5,
+    },
+    timeText: {
+        fontSize: 12,
+        color: '#888',
+        marginLeft: 5,
     },
 });

@@ -1,32 +1,42 @@
 import React from 'react';
-import {StyleSheet, ScrollView, Text, View } from 'react-native';
+import { StyleSheet, Image, ScrollView, Text, View } from 'react-native';
 import Task from '@/components/Task';
 import { useTaskContext } from '@/components/TaskContext';
 
 export default function CompletedTasks() {
-  const { taskItems, setTaskItems } = useTaskContext();
+  const { taskLists, saveTaskLists } = useTaskContext();
 
-  const completedTasks = taskItems.filter(task => task.completed);
+  const completedTasks = taskLists.flatMap(list => list.tasks.filter(task => task.completed));
 
-  const toggleTaskCompletion = (taskId: number) => {
-    const updatedTasks = taskItems.map(item => 
+  const toggleTaskCompletion = async (taskId: number) => {
+    //const list = taskLists.find(list => list.tasks.some(task => task.id === taskId));
+    const list = taskLists.find(list => list.tasks.find(task => task.id === taskId));
+
+    if (list) {
+      const updatedTasks = list.tasks.map(item =>
         item.id === taskId ? { ...item, completed: !item.completed } : item
-    );
-    setTaskItems(updatedTasks);
+      );
+      const updatedTaskLists = taskLists.map(l =>
+        l.id === list.id ? { ...l, tasks: updatedTasks } : l
+      );
+      await saveTaskLists(updatedTaskLists);
+    }
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.tasksWrapper}>
-        
         <ScrollView style={styles.items}>
-            {completedTasks.length === 0 ? (
-                <Text>No completed tasks</Text>
-            ) : (
-                completedTasks.map((task) => (
-                <Task key={task.id} text={task.text} completed={task.completed} onToggleComplete={() => toggleTaskCompletion(task.id)}/>
-                ))
-            )}
+          {completedTasks.length === 0 ? (
+            <View style={styles.imageWrapper}>
+              <Image source={require('@/assets/images/cat.png')} style={styles.image} />
+              <Text style={styles.nothingText}> No completed task </Text>
+            </View>
+          ) : (
+            completedTasks.map((task) => (
+              <Task key={task.id} text={task.text} completed={task.completed} onToggleComplete={() => toggleTaskCompletion(task.id)} />
+            ))
+          )}
         </ScrollView>
       </View>
     </View>
@@ -47,11 +57,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   items: {
-    marginTop: 30,
+    marginTop: 10,
+    marginBottom: 150,
   },
   writeTaskWrapper: {
     position: 'absolute',
-    bottom: 60,    
+    bottom: 60,
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -80,7 +91,6 @@ const styles = StyleSheet.create({
 
   },
   imageWrapper: {
-    //backgroundColor: '#3399FF',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 100,
